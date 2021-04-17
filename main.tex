@@ -1,0 +1,153 @@
+\documentclass{ethz-assignment}
+
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{csquotes}
+\usepackage{marvosym}
+\usepackage{bm}
+
+\usepackage{bussproofs}
+
+\newenvironment{bprooftree}
+  {\leavevmode\hbox\bgroup}
+  {\DisplayProof\egroup}
+
+\usetikzlibrary{positioning,fit,calc,plotmarks,shapes.multipart,shapes,arrows,automata}
+
+\title{Formal Methods and Functional Programming -- Summary}
+\author{Yannis Huber}
+\date{February 2021}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\section{Functional Programming}
+
+
+
+\subsection{Natural Deduction}
+Natural deduction (ND) provides a way to reason formally about a system. A deductive proof system over a language is based on a set of rules which can be used to construct derivations under assumptions. A \textbf{rule} of the form 
+\[A_1, ..., A_n \vdash A,\]
+reads as \enquote{$A$ follows from $A_1, ..., A_n$}. A \textbf{derivation} is a tree of rules and a \textbf{proof} is a derivation whose root has no assumptions. A deductive system must be \textbf{sound} (everything that is provable is in fact true) and \textbf{complete} (everything that is true has a proof).
+
+\subsubsection{Derivation Rules for Propositional Logic}
+
+\begin{center}
+    
+
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A$}
+\AxiomC{$\Gamma \vdash B$}
+\RightLabel{$\land$-I}
+\BinaryInfC{$\Gamma \vdash A \land B$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A \land B$}
+\RightLabel{$\land$-EL}
+\UnaryInfC{$\Gamma \vdash A$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A \land B$}
+\RightLabel{$\land$-ER}
+\UnaryInfC{$\Gamma \vdash B$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma, A \vdash B$}
+\RightLabel{$\rightarrow$-I}
+\UnaryInfC{$\Gamma \vdash A \rightarrow B$}
+\end{bprooftree}
+
+\vspace{1em}
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A \rightarrow B$}
+\AxiomC{$\Gamma \vdash A$}
+\RightLabel{$\rightarrow$-E}
+\BinaryInfC{$\Gamma \vdash B$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A$}
+\RightLabel{$\lor$-IL}
+\UnaryInfC{$\Gamma \vdash A \lor B$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash B$}
+\RightLabel{$\lor$-IR}
+\UnaryInfC{$\Gamma \vdash A \lor B$}
+\end{bprooftree}
+
+\vspace{1em}
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A \lor B$}
+\AxiomC{$\Gamma, A \vdash C$}
+\AxiomC{$\Gamma, B \vdash C$}
+\RightLabel{$\lor$-E}
+\TrinaryInfC{$\Gamma \vdash C$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash \bot$}
+\RightLabel{$\bot$-E}
+\UnaryInfC{$\Gamma \vdash A$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash \lnot A$}
+\AxiomC{$\Gamma \vdash A$}
+\RightLabel{$\lnot$-E}
+\BinaryInfC{$\Gamma \vdash B$}
+\end{bprooftree}
+\begin{bprooftree}
+\AxiomC{$\Gamma, \lnot A \vdash \bot$}
+\RightLabel{RAA}
+\UnaryInfC{$\Gamma \vdash A$}
+\end{bprooftree}
+\end{center}
+
+\subsubsection{First-Order Logic}
+We can rename \textbf{bound} variables at any time with $\bm{\alpha}$\textbf{-conversion}.
+% $\lambda x$.\texttt{\frenchspacing($x$ 1 True, $x$ 0) :: (Int -> Bool -> a) -> (a, Bool -> a)}:
+
+% \begin{prooftree}
+% \def\extraVskip{4pt}
+% \AxiomC{\tikz{\node [trapezium, trapezium angle=60, minimum width=5mm, draw, thick] {};}}
+% \AxiomC{}
+% \RightLabel{\small True}
+% \UnaryInfC{$\Gamma \vdash$ \texttt{\frenchspacing True :: $\tau_1$}}
+% \RightLabel{\small App}
+% \BinaryInfC{$\Gamma \vdash$ \texttt{\frenchspacing$x$ 1 True :: a}}
+% \RightLabel{\small App}
+% \AxiomC{}
+% \RightLabel{\small Var}
+% \UnaryInfC{$\Gamma \vdash x$\texttt{\frenchspacing :: $\tau_0$ -> Bool -> a}}
+% \AxiomC{}
+% \RightLabel{\small Int}
+% \UnaryInfC{\texttt{\frenchspacing$\Gamma \vdash 0$ :: $\tau_0$}}
+% \RightLabel{\small App}
+% \BinaryInfC{$\Gamma \vdash$ \texttt{\frenchspacing$x$ 0 :: Bool -> a}}
+% \RightLabel{\small Tuple}
+% \BinaryInfC{\texttt{\frenchspacing$\Gamma := x$ : (Int -> Bool -> a)} $\vdash$ \texttt{\frenchspacing($x$ 1 True, $x$ 0) :: (a, Bool -> a)}}
+% \RightLabel{\small Abs}
+% \UnaryInfC{$ \vdash \lambda x$.\texttt{\frenchspacing($x$ 1 True, $x$ 0) :: (Int -> Bool -> a) -> (a, Bool -> a)}}
+% \end{prooftree}
+
+% Where \tikz{\node [trapezium, trapezium angle=60, minimum width=5mm, draw, thick] {};} is:
+
+% \begin{prooftree}
+% \def\extraVskip{4pt}
+% \AxiomC{}
+% \RightLabel{\small Var}
+% \UnaryInfC{$\Gamma \vdash$ \texttt{\frenchspacing$x$ :: $\tau_2$ -> $\tau_1$ -> a}}
+% \AxiomC{}
+% \RightLabel{\small Int}
+% \UnaryInfC{$\Gamma \vdash$ \texttt{\frenchspacing1 :: $\tau_2$}}
+% \RightLabel{\small App}
+% \BinaryInfC{$\Gamma \vdash$ \texttt{\frenchspacing$x$ 1 :: $\tau_1$ -> a}}
+% \end{prooftree}
+
+% Constraints:
+% $\tau_0$ = \texttt{Int}, $\tau_1$ = \texttt{Bool}, $\tau_2$ = \texttt{Int}.
+
+
+\end{document}
