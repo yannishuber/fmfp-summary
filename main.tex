@@ -36,9 +36,8 @@ reads as \enquote{$A$ follows from $A_1, ..., A_n$}. A \textbf{derivation} is a 
 
 \subsubsection{Derivation Rules for Propositional Logic}
 
+\vspace{1em}
 \begin{center}
-    
-
 \begin{bprooftree}
 \AxiomC{$\Gamma \vdash A$}
 \AxiomC{$\Gamma \vdash B$}
@@ -106,7 +105,109 @@ reads as \enquote{$A$ follows from $A_1, ..., A_n$}. A \textbf{derivation} is a 
 \end{center}
 
 \subsubsection{First-Order Logic}
-We can rename \textbf{bound} variables at any time with $\bm{\alpha}$\textbf{-conversion}.
+We can rename \textbf{bound} variables at any time with $\bm{\alpha}$\textbf{-conversion}. Regarding the operators, $\land$ binds stronger than $\lor$, which itself binds stronger than $\rightarrow$. \textbf{$\rightarrow$ associates to the right}; $\land$ and $\lor$ bind to the left. Quantifiers bind as far to the right as possible.
+
+\subsubsection{Capture-Avoiding Substitutions}
+We write $A[x/t]$ to indicate that we substitute the \texttt{free} variable $x$ by $t$ in $A$. To avoid capture, $t$ must still be \textbf{free} in $A$. If necessary use $\alpha$-conversion before. For example, let $A \equiv \exists y. y*x = x * z$:
+
+\begin{align*}
+    A[x/3 + y] &\not\equiv \exists y.y * (3+y) = (3+y)*z \\
+    A[x/3 + y] & \equiv \exists w.w * (3+y) = (3+y)*z \tag{$\alpha$-convert $y$ to $w$}
+\end{align*}
+
+\subsubsection{Derivation Rules for First-Order Logic}
+The derivation rules for first-order logic are the same as in propositional logic with addition of the following rules:
+
+\vspace{1em}
+\begin{center}
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A$}
+\RightLabel{$\forall$-I*}
+\UnaryInfC{$\Gamma \vdash \forall x. A$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash \forall x. A$}
+\RightLabel{$\forall$-E}
+\UnaryInfC{$\Gamma \vdash A[x/t]$}
+\end{bprooftree}\qquad
+
+\vspace{1em}
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash A[x/t]$}
+\RightLabel{$\exists$-I}
+\UnaryInfC{$\Gamma \vdash \exists x. A$}
+\end{bprooftree}\qquad
+\begin{bprooftree}
+\AxiomC{$\Gamma \vdash \exists x. A$}
+\AxiomC{$\Gamma, A \vdash B$}
+\RightLabel{$\exists$-E**}
+\BinaryInfC{$\Gamma \vdash B$}
+\end{bprooftree}
+\end{center}
+
+\noindent
+(*): $x$ does not occur freely in any formula in $\Gamma$ \\
+(**): $x$ does not occur freely in any formula in $\Gamma$ or B
+
+\noindent
+\textbf{It is important to always check the side conditions!}
+
+\subsubsection{Natural Deduction Example}
+We want to prove the following statement using natural deduction for first-order logic.
+\[(\exists x. \forall y. \lnot P \lor Q) \rightarrow (\forall y. \exists x. P \rightarrow Q)\]
+
+\begin{center}
+    \begin{prooftree}
+    \def\extraVskip{4pt}
+    \AxiomC{}
+    \RightLabel{\small Axiom}
+    \UnaryInfC{$\Gamma_1 \vdash \exists x. \forall y. \lnot P \lor Q$}
+    \AxiomC{}
+    \RightLabel{\small Axiom}
+    \UnaryInfC{$\Gamma_2, P \vdash \forall y. \lnot P \lor Q$}
+    \RightLabel{\small $\forall$-E}
+    \UnaryInfC{$\Gamma_2, P \vdash \lnot P \lor Q$}
+    \AxiomC{}
+    \RightLabel{\small Axiom}
+    \UnaryInfC{$\Gamma_2, P, Q \vdash Q$}
+    
+    % \AxiomC{\tikz{\node [trapezium, trapezium angle=60, minimum width=5mm, draw, thick] {};}}
+    \AxiomC{}
+    \RightLabel{\small Axiom}
+    \UnaryInfC{$\Gamma_2, P, \lnot P \vdash \lnot P$}
+    \AxiomC{}
+    \RightLabel{\small Axiom}
+    \UnaryInfC{$\Gamma_2, P, \lnot P \vdash P$}
+    \RightLabel{\small $\lnot$-E}
+    \BinaryInfC{$\Gamma_2, P, \lnot P \vdash Q$}
+    
+    \RightLabel{\small $\lor$-E}
+    \TrinaryInfC{$\Gamma_2, P \vdash Q$}
+    \RightLabel{\small $\rightarrow$-I}
+    \UnaryInfC{$\Gamma_2 \vdash P \rightarrow Q$}
+    \RightLabel{\small $\exists$-I}
+    \UnaryInfC{$\Gamma_2 \vdash \exists x. P \rightarrow Q$}
+    \RightLabel{\small $\exists$-E**}
+    \insertBetweenHyps{\hskip -60pt}
+    \BinaryInfC{$\Gamma_1 \vdash \exists x. P \rightarrow Q$}
+    \RightLabel{\small $\forall$-I*}
+    \UnaryInfC{$\Gamma_1 \vdash \forall y. \exists x. P \rightarrow Q$}
+    \RightLabel{\small $\rightarrow$-I}
+    \UnaryInfC{$\vdash (\exists x. \forall y. \lnot P \lor Q) \rightarrow (\forall y. \exists x. P \rightarrow Q)$}
+    \end{prooftree}
+\end{center}
+
+\begin{align*}
+    \Gamma_1 &:= \exists x. \forall y. \lnot P \lor Q \\
+    \Gamma_2 &:= \exists x. \forall y. \lnot P \lor Q, \forall y. \lnot P \lor Q
+\end{align*}
+
+\subsection{Correctness}
+Correctness is rarely obvious, therefore it must be proven.
+
+\subsubsection{Termination}
+A sufficient condition for termination of a function $f$ is that its arguments are smaller along a \textbf{well-founded} order on the function's domain. An order $>_S$ on a set $S$ is well-founded if and only if there is no infinite decreasing chain $x_1 > x_2 > x_3 > ...$, for $x_i \in S$.
+
 % $\lambda x$.\texttt{\frenchspacing($x$ 1 True, $x$ 0) :: (Int -> Bool -> a) -> (a, Bool -> a)}:
 
 % \begin{prooftree}
